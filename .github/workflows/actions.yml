@@ -10,6 +10,7 @@ on:
 
 env:
   DOCKER_IMAGE_NAME: backend-services-arquetipo-sprint
+  DOCKERHUB_USER: ${{ vars.DOCKERHUB_USER }}
 
 jobs:
   build:
@@ -67,10 +68,8 @@ jobs:
         run: |
           mvn package
           POM_VERSION="$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)-$(date +%Y%m%d%H%M%S)"
+          echo "POM_VERSION=${POM_VERSION}" >> $GITHUB_ENV
           echo "$POM_VERSION" > pom_version.txt
-          echo "###########################"
-          echo "$POM_VERSION"
-          echo "###########################"
 
       - name: Upload package artifacts
         uses: actions/upload-artifact@v3
@@ -117,19 +116,15 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKERHUB_USER }}
+          username: ${{ env.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-      - name: Read POM version
-        id: read_version
-        run: echo "POM_VERSION=$(cat pom_version.txt)" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ vars.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.POM_VERSION }} .
-          docker push ${{ vars.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.POM_VERSION }}
-          docker tag ${{ vars.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.POM_VERSION }} ${{ vars.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-          docker push ${{ vars.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+          docker build -t ${{ env.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.POM_VERSION }} .
+          docker push ${{ env.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.POM_VERSION }}
+          docker tag ${{ env.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.POM_VERSION }} ${{ env.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+          docker push ${{ env.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:latest
 
       - name: Logout from DockerHub
         run: docker logout
