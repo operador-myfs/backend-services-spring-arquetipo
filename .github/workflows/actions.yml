@@ -68,6 +68,9 @@ jobs:
           mvn package
           POM_VERSION="$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)-$(date +%Y%m%d%H%M%S)"
           echo "$POM_VERSION" > pom_version.txt
+          echo "###########################"
+          echo "$POM_VERSION"
+          echo "###########################"
 
       - name: Upload package artifacts
         uses: actions/upload-artifact@v3
