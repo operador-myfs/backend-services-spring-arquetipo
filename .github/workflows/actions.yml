@@ -114,7 +114,7 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
-          username: ${{ env.DOCKERHUB_USER }}
+          username: ${{ vars.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Read POM version
@@ -123,10 +123,10 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ env.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.POM_VERSION }} .
-          docker push ${{ env.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.POM_VERSION }}
-          docker tag ${{ env.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.POM_VERSION }} ${{ env.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-          docker push ${{ env.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+          docker build -t ${{ vars.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.POM_VERSION }} .
+          docker push ${{ vars.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.POM_VERSION }}
+          docker tag ${{ vars.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.POM_VERSION }} ${{ vars.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+          docker push ${{ vars.DOCKERHUB_USER }}/${{ env.DOCKER_IMAGE_NAME }}:latest
 
       - name: Logout from DockerHub
         run: docker logout
