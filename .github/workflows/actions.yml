@@ -68,7 +68,6 @@ jobs:
         run: |
           mvn package
           POM_VERSION="$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)-$(date +%Y%m%d%H%M%S)"
-          echo "POM_VERSION=${POM_VERSION}" >> $GITHUB_ENV
           echo "$POM_VERSION" > pom_version.txt
 
       - name: Upload package artifacts
@@ -118,6 +117,10 @@ jobs:
         with:
           username: ${{ env.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Read POM version
+        id: read_version
+        run: echo "POM_VERSION=$(cat pom_version.txt)" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         run: |
